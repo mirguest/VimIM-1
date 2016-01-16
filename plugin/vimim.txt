@@ -2132,6 +2132,7 @@ net 网
 netherlands 荷兰
 network 网络 联网
 neutrino 中微子
+zhongweizi 中微子
 nevada 内华达
 never 永不 从不 决不 未曾
 new 新 新的
