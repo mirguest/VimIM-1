@@ -1879,6 +1879,8 @@ limb 四肢 手足
 limit 极限 有限 范围 限制
 line 线
 link 连接 连环
+lint 林韬
+lintao 林韬
 lion 狮 狮子
 lip 唇 嘴唇 阴唇
 liquid 液体
