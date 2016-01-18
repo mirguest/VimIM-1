@@ -450,11 +450,11 @@ function! s:vimim_dictionary_punctuations()
     let one =       " { }  ( )  < >  [  ] "
     let two = join(split(join(split(s:antonym)[:3],''),'\zs'))
     let antonyms = s:vimim_key_value_hash(one, two)
-    let one = " ,  .  +  -  ~  ^    _    "
-    let two = " ， 。 ＋ － ～ …… —— "
+    let one = " ,  . "
+    let two = " ， 。 "
     let mini_punctuations = s:vimim_key_value_hash(one, two)
-    let one = " @  :  #  &  %  $  !  =  ;  ?  * "
-    let two = " 　 ： ＃ ＆ ％ ￥ ！ ＝ ； ？ ﹡"
+    let one = " @  :  #  &  %  $  !  =  ;  ?  *  +  -  ~  ^    _    "
+    let two = " 　 ： ＃ ＆ ％ ￥ ！ ＝ ； ？ ﹡ ＋ － ～ …… —— "
     let most_punctuations = s:vimim_key_value_hash(one, two)
     call extend(most_punctuations, antonyms)
     let s:key_evils = { '\' : "、", "'" : "‘’", '"' : "“”" }

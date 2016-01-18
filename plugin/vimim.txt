@@ -3512,6 +3512,7 @@ year 年 年岁 年龄 骨龄
 yell 叫喊 喊叫 呼叫 号叫
 yemen 也门
 yes 是的
+yeshan 液闪
 yesterday 昨天
 yet 还 仍然
 yield 供给 产
