@@ -99,6 +99,7 @@ purple 紫色 紫
 white  白色 白
 grey   灰色 灰
 pink   粉红 桃色
+pingxingguang 平行光
 golden 金色 金色的
 
 gb       国标 国标码
@@ -638,6 +639,7 @@ chance 机会 偶然
 chanel 香奈尔
 change 变化 改变
 channel 通道 海峡 航道
+chanshengzi 产生子
 chaos 混乱 混沌 凌乱
 chapel 礼拜堂
 chapter 章
@@ -1364,6 +1366,7 @@ gabon 加蓬
 gadfly 牛虻
 gadolinium 钆
 gain 获取 获得
+gai 该
 gale 强风
 gallop 奔驰 飞跑
 gambia 冈比亚
@@ -1464,6 +1467,8 @@ grow 生长 长成
 growl 咆哮
 guarantee 保证 包管
 guard 警卫 防守
+guangdianbeizengguan 光电倍增管
+guangxuemoxing 光学模型
 guess 猜测 以为 估计
 guest 客人 宾客
 guide 向导
@@ -1518,7 +1523,6 @@ hat 帽子
 hate 恨 憎恨
 have 有
 hawaii 夏威夷
-he 他
 head 头 头颅 首领
 headache 头痛
 headchop 斩首
@@ -1760,6 +1764,7 @@ junction 结
 junkfood 垃圾食品
 just 刚才 恰好 正当
 juyiqi 居移气，养移体
+jingji 径迹
 karma 因果报应 因果 热度值
 keen 尖锐 热心 激烈
 keep 保存 保持 保留
@@ -2063,6 +2068,7 @@ moment 一瞬间 刹那 片刻
 monaco 摩纳哥
 money 钱 金钱
 mongolia 蒙古
+moni 模拟
 monitor 监视器
 monkey 猴子
 montana 蒙大拿
@@ -2089,6 +2095,7 @@ mouth 口 嘴
 move 移动 运动
 movement 运动
 movie 电影
+motai 末态
 mrs 太太 夫人
 much 大量 很多 许多
 mud 泥
@@ -2560,6 +2567,7 @@ quiver 摇动
 quiver 震 颤
 quotation 引用 语录
 quote 单引号 引用 援引 摘引 断字符号
+qushu 取数
 rabbit 兔子
 race 人种 竟赛 赛跑
 racket 吵闹
@@ -2849,6 +2857,7 @@ shy 害臊 怕羞
 sick 生病 不舒服
 sickness 疾病
 side 边 侧旁
+sidongliang 四动量
 siege 围城 围攻 包围
 sigh 叹气
 sight 名胜 视力
@@ -3518,7 +3527,7 @@ yet 还 仍然
 yield 供给 产
 yoga 瑜珈
 yosemite 优胜美地 国家公园
-you 你 妳
+you 有 由 你 妳
 yuga 瑜伽
 zebra 斑马
 zinc 锌
