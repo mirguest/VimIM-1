@@ -2055,66 +2055,6 @@ EOF
 return ""
 endfunction
 
-function! s:vimim_mycloud_python_init()
-:sil!python << EOF
-import vim, sys, socket
-BUFSIZE = 1024
-def tcpslice(sendfunc, data):
-    senddata = data
-    while len(senddata) >= BUFSIZE:
-        sendfunc(senddata[0:BUFSIZE])
-        senddata = senddata[BUFSIZE:]
-    if senddata[-1:] == "\n":
-        sendfunc(senddata)
-    else:
-        sendfunc(senddata+"\n")
-def tcpsend(data, host, port):
-    addr = host, port
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.connect(addr)
-    except Exception, inst:
-        s.close()
-        return None
-    ret = ""
-    for item in data.split("\n"):
-        if item == "":
-            continue
-        tcpslice(s.send, item)
-        cachedata = ""
-        while cachedata[-1:] != "\n":
-            data = s.recv(BUFSIZE)
-            cachedata += data
-        if cachedata == "server closed\n":
-            break
-        ret += cachedata
-    s.close()
-    return ret
-def parsefunc(keyb, host="localhost", port=10007):
-    src = keyb.encode("base64")
-    ret = tcpsend(src, host, port)
-    if type(ret).__name__ == "str":
-        try:
-            return ret.decode("base64")
-        except Exception:
-            return ""
-    else:
-        return ""
-EOF
-endfunction
-
-function! s:vimim_mycloud_python_client(cmd)
-:sil!python << EOF
-try:
-    cmd  = vim.eval("a:cmd")
-    HOST = vim.eval("s:mycloud_host")
-    PORT = int(vim.eval("s:mycloud_port"))
-    ret = parsefunc(cmd, HOST, PORT)
-    vim.command('return "%s"' % ret)
-except vim.error:
-    print("vim error: %s" % vim.error)
-EOF
-endfunction
 
 " ============================================= }}}
 let s:VimIM += [" ====  backend: file    ==== {{{"]
