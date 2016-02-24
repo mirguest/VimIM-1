@@ -2161,6 +2161,7 @@ function! s:vimim_popupmenu_list(lines)
             let chinese .= empty(tail) || tail == "'" ? '' : tail
             let complete_items["abbr"] = titleline . chinese
             let complete_items["menu"] = menu
+            "echom "complete_items: ".string(complete_items)
         endif
         if s:mode.windowless
             if s:vimim_cjk() " display sexy english and dynamic 4corner
