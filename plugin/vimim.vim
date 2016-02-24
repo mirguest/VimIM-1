@@ -140,17 +140,6 @@ function! s:vimim_dictionary_keycodes()
     for key in split( ' pinyin ')
         let s:keycodes[key] = "['a-z0-9]"
     endfor
-    for key in split('array30 phonetic')
-        let s:keycodes[key] = "[.,a-z0-9;/]"
-    endfor
-    for key in split('zhengma taijima cangjie hangul xinhua quick')
-        let s:keycodes[key] = "['a-z]"
-    endfor
-    let s:keycodes.wu       = "['a-z]"      " s:ui.quote=1
-    let s:keycodes.nature   = "['a-z]"      " s:ui.quote=1
-    let s:keycodes.yong     = "['a-z.;/]"   " s:ui.quote=1
-    let s:keycodes.erbi     = "['a-z.;/,]"  " s:ui.quote=1
-    let s:keycodes.boshiamy = "['a-z.],[]"  " s:ui.quote=1
     let ime  = ' pinyin_sogou pinyin_quote_sogou pinyin_huge'
     let ime .= ' pinyin_fcitx pinyin_canton pinyin_hongkong'
     let s:all_vimim_input_methods = keys(s:keycodes) + split(ime)
@@ -873,83 +862,6 @@ function! s:vimim_get_seamless(cursor_positions)
         endif
     endfor
     return seamless_column
-endfunction
-
-" ============================================= }}}
-let s:VimIM += [" ====  input: visual    ==== {{{"]
-" =================================================
-
-function! g:Vimim_visual()
-    let key = ""
-    let lines = split(getreg('"'), '\n')
-    let line = get(lines,0)
-    let space = "\<C-R>=repeat(' '," .string(virtcol("'<'")-2). ")\<CR>"
-    if len(lines) == 1 && len(line) == s:multibyte
-        " highlight one chinese => get antonym or number loop
-        let results = s:vimim_imode_visual(line)
-        if !empty(results)
-            let key = "gvr" . get(results,0) . "ga"
-        endif
-        if s:vimim_cjk()
-            let line = match(s:cjk.lines, "^".line)
-            call s:vimim_set_title(s:space.get(s:cjk.lines,line))
-        endif
-    elseif match(lines,'\d') > -1 && join(lines) !~ '[^0-9[:blank:].]'
-        call setpos(".", getpos("'>'"))  " vertical digit block =>
-        let sum = eval(join(lines,'+'))  " count*average=summary
-        let ave = printf("%.2f", 1.0*sum/len(lines))
-        let line = substitute(ave."=".string(sum), '[.]0\+', '', 'g')
-        let line = string(len(lines)) . '*' . line
-        let key = "o" . nr2char(4) . space . " " . line . nr2char(27)
-    else
-        sil!call s:vimim_start()
-        let visual = nr2char(30) . "\<C-R>=g:Vimim()\<CR>"
-        if len(lines) < 2 " highlight multiple cjk => show property
-            let s:seamless_positions = getpos("'<'")
-            let chinese = get(split(line,'\zs'),0)
-            let ddddd = char2nr(chinese) =~ '\d\d\d\d\d' ? "'''''" : line
-            let key = "gvc" . ddddd . visual
-        else              " highlighted block => play block with hjkl
-            let key = "O^\<C-D>" . space . "''''" . visual
-        endif
-    endif
-    return feedkeys(key,"n")
-endfunction
-
-function! s:vimim_imode_visual(char_before)
-    let items = []
-    let numbers = []
-    let results = []
-    if empty(s:loops)
-        for i in range(len(s:numbers))
-            call add(items, split(s:numbers[i],'\zs'))
-        endfor
-        for j in range(len(get(items,0)))
-            let number = ""
-            for line in items
-                let number .= get(line,j)
-            endfor
-            call add(numbers, number)
-        endfor
-        for loop in numbers + split(s:antonym) + split("金石 真假 胜败")
-            let loops = split(loop, '\zs')
-            for i in range(len(loops))
-                let j = i==len(loops)-1 ? 0 : i+1
-                let s:loops[loops[i]] = loops[j]
-            endfor
-        endfor
-    endif
-    let char_before = a:char_before
-    if has_key(s:loops, char_before)
-        let start = char_before
-        let next = ""
-        while start != next
-            let next = s:loops[char_before]
-            call add(results, next)
-            let char_before = next
-        endwhile
-    endif
-    return results
 endfunction
 
 " ============================================= }}}
@@ -2206,7 +2118,6 @@ function! s:vimim_plug_and_play()
     nnoremap <silent> <C-_> i<C-R>=g:Vimim_chinese()<CR><Esc>
     inoremap <unique> <C-_>  <C-R>=g:Vimim_chinese()<CR>
     inoremap <silent> <C-^>  <C-R>=g:Vimim_onekey()<CR>
-    xnoremap <silent> <C-^> y:call g:Vimim_visual()<CR>
     if g:Vimim_map !~ 'no-gi'
         nnoremap <silent> gi a<C-R>=g:Vimim_gi()<CR>
             xmap <silent> gi  <C-^>
