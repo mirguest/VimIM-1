@@ -109,9 +109,7 @@ function! s:vimim_initialize_global()
     let s:seamless_positions = []
     let s:starts = { 'row' : 0, 'column' : 1 }
     let s:quanpin_table = {}
-    let s:shuangpin_table = {}
     let s:http_exe = ""
-    let s:shuangpin = 'abc ms plusplus purple flypy nature'
     let s:abcd = split("'abcdvfgxz", '\zs')
     let s:qwer = split("pqwertyuio", '\zs')
     let s:az_list = map(range(97,122),"nr2char(".'v:val'.")")
@@ -125,7 +123,6 @@ function! s:vimim_initialize_global()
     let s:ui = { 'root' : '', 'im' : '', 'quote' : 0, 'frontends' : [] }
     let s:rc = {}
     let s:rc["g:Vimim_mode"] = 'dynamic'
-    let s:rc["g:Vimim_shuangpin"] = 0
     let s:rc["g:Vimim_map"] = ''
     let s:rc["g:Vimim_toggle"] = 0
     let s:rc["g:Vimim_cloud"] = 'baidu,sogou,qq,google'
@@ -168,10 +165,8 @@ function! s:vimim_set_frontend()
     let quote = 'erbi wu nature yong boshiamy'   " quote in datafile
     let cloud = get(split(g:Vimim_cloud,','), 0) " default cloud
     let s:valid_keyboard = "[0-9a-z']"
-    if !empty(s:ui.root) && empty(g:Vimim_shuangpin)
+    if !empty(s:ui.root)
         let s:valid_keyboard = s:backend[s:ui.root][s:ui.im].keycode
-    elseif g:Vimim_shuangpin == 'ms' || g:Vimim_shuangpin == 'purple'
-        let s:valid_keyboard = "[0-9a-z';]"
     endif
     let i = 0
     let keycode_string = ""
@@ -337,7 +332,7 @@ function! s:vimim_get_hjkl_game(keyboard)
     let keyboard = a:keyboard
     let results = []
     let poem = s:vimim_filereadable(keyboard)
-    if keyboard =~# '^i' && keyboard =~ '\d' && empty(g:Vimim_shuangpin)
+    if keyboard =~# '^i' && keyboard =~ '\d'
         return s:vimim_imode_number(keyboard)
     elseif keyboard ==# 'itoday' || keyboard ==# 'inow'
         return [s:vimim_imode_today_now(keyboard)]
@@ -561,18 +556,7 @@ function! s:vimim_im_chinese()
         let vimim_cloud = get(clouds, match(clouds, s:cloud))
         if vimim_cloud =~ 'wubi'          " g:Vimim_cloud='qq.wubi'
             let title .= s:chinese(s:space, 'wubi')
-        elseif vimim_cloud =~ 'shuangpin' " qq.shuangpin.ms => ms
-            let shuangpin = get(split(vimim_cloud,"[.]"),-1)
-            if match(split(s:shuangpin),shuangpin) > -1
-                let title .= s:chinese(s:space, shuangpin, 'shuangpin')
-            endif
         endif
-    endif
-    if !empty(g:Vimim_shuangpin)
-        let title = s:chinese(s:space, g:Vimim_shuangpin, 'shuangpin')
-    endif
-    if g:Vimim_shuangpin =~ 'abc' || g:Vimim_cloud =~ 'abc'
-        let title = substitute(title,s:chinese('pin'),s:chinese('hit'),'')
     endif
     return title
 endfunction
@@ -1791,7 +1775,6 @@ endfunction
 function! s:vimim_more_pinyin_candidates(keyboard)
     " make standard menu layout:  mamahuhu => mamahu, mama
     if len(s:english.line) || s:ui.im !~ 'pinyin'
-    \|| !empty(g:Vimim_shuangpin) || g:Vimim_cloud =~ 'shuangpin'
         return []
     endif
     let candidates = []
@@ -1820,130 +1803,6 @@ function! s:vimim_cloud_pinyin(keyboard, match_list)
         call add(match_list, pair)
     endfor
     return match_list
-endfunction
-
-" ============================================= }}}
-let s:VimIM += [" ====  input: shuangpin ==== {{{"]
-" =================================================
-
-function! s:vimim_shuangpin_generic()
-    let shengmu_list = {}  " generate shuangpin table default value
-    for shengmu in s:shengmu_list
-        let shengmu_list[shengmu] = shengmu
-    endfor
-    let shengmu_list["'"] = "o"
-    let yunmu_list = {}
-    for yunmu in split("a o e i u v")
-        let yunmu_list[yunmu] = yunmu
-    endfor
-    return [shengmu_list, yunmu_list]
-endfunction
-
-function! s:vimim_shuangpin_rules(shuangpin, rules)
-    let rules = a:rules
-    let key  = ' ou ei ang en iong ua er ng ia ie ing un uo in ue '
-    let key .= ' uan iu uai ong eng iang ui ai an ao iao ian uang '
-    let v = ''  " various value to almost the same key set
-    if a:shuangpin == 'ms'         " test: viui => zhishi
-        let v = join(split('bzhfswrgwx;pontrqysgdvljkcmdy','\zs'))
-        call extend(rules[0], { "zh" : "v", "ch" : "i", "sh" : "u" })
-        let key .= 'v'  " microsoft shuangpin has one additional key
-    elseif a:shuangpin == 'abc'    " test: vtpc => shuang pin
-        let v = 'b q h f s d r g d x y n o c m p r c s g t m l j k z w t'
-        call extend(rules[0], { "zh" : "a", "ch" : "e", "sh" : "v" })
-    elseif a:shuangpin == 'nature' " test: woui => wo shi => i am
-        let v = 'b z h f s w r g w x y p o n t r q y s g d v l j k c m d'
-        call extend(rules[0], { "zh" : "v", "ch" : "i", "sh" : "u" })
-    elseif a:shuangpin == 'plusplus'
-        let v = 'p w g r y b q t b m q z o l x c n x y t h v s f d k j h'
-        call extend(rules[0], { "zh" : "v", "ch" : "u", "sh" : "i" })
-    elseif a:shuangpin == 'purple'
-        let v = 'z k s w h x j t x d ; m o y n l j y h t g n p r q b f g'
-        call extend(rules[0], { "zh" : "u", "ch" : "a", "sh" : "i" })
-    elseif a:shuangpin == 'flypy'
-        let v = 'z w h f s x r g x p k y o b t r q k s g l v d j c n m l'
-        call extend(rules[0], { "zh" : "v", "ch" : "i", "sh" : "u" })
-    endif
-    call extend(rules[1], s:vimim_key_value_hash(key, v))
-    return rules
-endfunction
-
-function! s:vimim_create_shuangpin_table(rules)
-    let pinyin_list = s:vimim_get_all_valid_pinyin_list()
-    let sptable = {}  " generate table for shengmu-yunmu pairs match
-    for key in pinyin_list
-        if key !~ "['a-z]*"
-            continue
-        endif
-        let shengmu = key[0]
-        let yunmu = key[1:]
-        if key[1] == "h"
-            let shengmu = key[:1]
-            let yunmu = key[2:]
-        endif
-        if has_key(a:rules[0], shengmu)
-            let shuangpin_shengmu = a:rules[0][shengmu]
-        else
-            continue
-        endif
-        if has_key(a:rules[1], yunmu)
-            let shuangpin_yunmu = a:rules[1][yunmu]
-        else
-            continue
-        endif
-        let sp1 = shuangpin_shengmu.shuangpin_yunmu
-        if !has_key(sptable, sp1)
-            let sptable[sp1] = key[0] == "'" ? key[1:] : key
-        endif
-    endfor
-    if match(split("abc purple nature flypy"), g:Vimim_shuangpin) > -1
-        let jxqy = {"jv":"ju", "qv":"qu", "xv":"xu", "yv":"yu"}
-        call extend(sptable, jxqy)
-    elseif g:Vimim_shuangpin == 'ms' " jxqy+v special case handling
-        let jxqy = {"jv":"jue", "qv":"que", "xv":"xue", "yv":"yue"}
-        call extend(sptable, jxqy)
-    endif
-    if g:Vimim_shuangpin == 'flypy'  " flypy special case handling
-        let key   = 'ou eg  er an ao ai aa en oo os  ah  ee ei'
-        let value = 'ou eng er an ao ai a  en o  ong ang e  ei'
-        call extend(sptable, s:vimim_key_value_hash(key, value))
-    endif
-    if g:Vimim_shuangpin == 'nature' " nature special case handling
-        let nature = {"aa":"a", "oo":"o", "ee":"e" }
-        call extend(sptable, nature)
-    endif
-    for [key, value] in items(a:rules[0])
-        let sptable[value] = key  " table for shengmu-only match
-        if key[0] == "'"
-            let sptable[value] = ""
-        endif
-    endfor
-    return sptable
-endfunction
-
-function! s:vimim_shuangpin_transform(keyboard)
-    let size = strlen(a:keyboard)
-    let ptr = 0
-    let output = ""
-    let bchar = ""    " workaround for sogou
-    while ptr < size
-        if a:keyboard[ptr] !~ "[a-z;]"   "  bypass all non-characters
-            let output .= a:keyboard[ptr]
-            let ptr += 1
-        else
-            let sp1 = a:keyboard[ptr]
-            if a:keyboard[ptr+1] =~ "[a-z;]"
-                let sp1 .= a:keyboard[ptr+1]
-            endif
-            if has_key(s:shuangpin_table, sp1)
-                let output .= bchar . s:shuangpin_table[sp1]
-            else    " the last odd shuangpin code as only shengmu
-                let output .= sp1 " invalid shuangpin code are preserved
-            endif
-            let ptr += strlen(sp1)
-        endif
-    endwhile
-    return output[0] == "'" ? output[1:] : output
 endfunction
 
 " ============================================= }}}
@@ -2472,17 +2331,6 @@ else
         else  " flat failure from mycloud
             sil!call s:vimim_debug('mycloud fatal', keyboard, v:exception)
             return []
-        endif
-    endif
-    if !empty(g:Vimim_shuangpin) && g:Vimim_cloud !~ 'shuangpin'
-        if empty(s:shuangpin_table)
-            let rules = s:vimim_shuangpin_generic()
-            let rules = s:vimim_shuangpin_rules(g:Vimim_shuangpin, rules)
-            let s:shuangpin_table = s:vimim_create_shuangpin_table(rules)
-        endif
-        if empty(s:has_shuangpin_transform)
-            let keyboard = s:vimim_shuangpin_transform(keyboard)
-            let s:keyboard = keyboard
         endif
     endif
     if s:ui.root == 'cloud' || keyboard[-1:] == "'" && empty(s:ui.quote)
