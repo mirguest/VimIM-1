@@ -147,7 +147,7 @@ function! s:vimim_dictionary_keycodes()
     for key in split('array30 phonetic')
         let s:keycodes[key] = "[.,a-z0-9;/]"
     endfor
-    for key in split('zhengma taijima wubi cangjie hangul xinhua quick')
+    for key in split('zhengma taijima cangjie hangul xinhua quick')
         let s:keycodes[key] = "['a-z]"
     endfor
     let s:keycodes.wu       = "['a-z]"      " s:ui.quote=1
@@ -157,7 +157,6 @@ function! s:vimim_dictionary_keycodes()
     let s:keycodes.boshiamy = "['a-z.],[]"  " s:ui.quote=1
     let ime  = ' pinyin_sogou pinyin_quote_sogou pinyin_huge'
     let ime .= ' pinyin_fcitx pinyin_canton pinyin_hongkong'
-    let ime .= ' wubi98 wubi2000 wubijd wubihf'
     let s:all_vimim_input_methods = keys(s:keycodes) + split(ime)
 endfunction
 
@@ -177,7 +176,7 @@ function! s:vimim_set_frontend()
         let i += 1
     endwhile
     let s:valid_keys = split(keycode_string, '\zs')
-    let s:wubi = cloud =~ 'wubi' || s:ui.im =~ 'wubi\|erbi' ? 1 : 0
+    let s:wubi = 0
     let s:ui.quote = match(split(quote),s:ui.im) < 0 ? 0 : 1
     let s:gi_dynamic = s:ui.im =~ 'pinyin' || s:ui.root =~ 'cloud' ? 0 : 1
     let logo = s:chinese('dscj')
@@ -421,19 +420,19 @@ let s:VimIM += [" ====  user interface   ==== {{{"]
 " =================================================
 
 function! s:vimim_dictionary_statusline()
-    let one  = " dscj wubi2000 taijima 4corner boshiamy input cjk nature"
+    let one  = " dscj taijima 4corner boshiamy input cjk nature"
     let two  = " 点石成金,點石成金 新世纪,新世紀 太极码,太極碼"
     let two .= " 四角号码,四角號碼 呒虾米,嘸蝦米 输入,輸入"
     let two .= " 标准字库,標準字庫 自然码,自然碼"
     let one .= " computer database option flypy network cloud env "
-    let one .= " encoding ms static dynamic erbi wubi hangul xinhua"
-    let one .= " zhengma cangjie yong wu wubijd shuangpin"
+    let one .= " encoding ms static dynamic erbi hangul xinhua"
+    let one .= " zhengma cangjie yong wu shuangpin"
     let two .= " 电脑,電腦 词库,詞庫 选项,選項 小鹤,小鶴 联网,聯網 云,雲 "
     let two .= " 环境,環境 编码,編碼 微软,微軟 静态,靜態 动态,動態"
     let two .= " 二笔,二筆 五笔,五筆 韩文,韓文 新华,新華 郑码,鄭碼"
     let two .= " 仓颉,倉頡 永码,永碼 吴语,吳語 极点,極點 双拼,雙拼"
     let one .= " hit fullwidth halfwidth english chinese purple plusplus"
-    let one .= " quick wubihf mycloud wubi98 pin pinyin phonetic array30"
+    let one .= " quick mycloud pin pinyin phonetic array30"
     let one .= " abc revision date google baidu sogou qq "
     let two .= " 打 全角 半角 英文 中文 紫光 加加 速成 海峰 自己的 98"
     let two .= " 拼 拼音 注音 行列 智能 版本 日期 谷歌 百度 搜狗 ＱＱ"
@@ -541,23 +540,6 @@ function! s:vimim_im_chinese()
     endif
     let backend = s:backend[s:ui.root][s:ui.im]
     let title = has_key(s:keycodes, s:ui.im) ? backend.chinese : ''
-    if s:ui.im =~ 'wubi'
-        for wubi in split('wubi98 wubi2000 wubijd wubihf')
-            if get(split(backend.name, '/'),-1) =~ wubi
-                let title .= s:chinese(wubi)
-            endif
-        endfor
-    elseif s:ui.im == 'mycloud'
-        let title .= s:chinese('cloud', s:space)
-        let title .= s:backend.cloud.mycloud.directory
-    elseif s:ui.root == 'cloud'
-        let title = s:chinese(s:space, s:cloud, 'cloud')
-        let clouds = split(g:Vimim_cloud,',')
-        let vimim_cloud = get(clouds, match(clouds, s:cloud))
-        if vimim_cloud =~ 'wubi'          " g:Vimim_cloud='qq.wubi'
-            let title .= s:chinese(s:space, 'wubi')
-        endif
-    endif
     return title
 endfunction
 
@@ -1922,7 +1904,6 @@ let s:VimIM += [" ====  backend: file    ==== {{{"]
 function! s:vimim_set_datafile(im, datafile)
     let im = a:im
     if isdirectory(a:datafile) | return
-    elseif im =~ '^wubi'       | let im = 'wubi'
     elseif im =~ '^pinyin'     | let im = 'pinyin' | endif
     let s:ui.root = 'datafile'
     let s:ui.im = im
@@ -2245,7 +2226,7 @@ let s:VimIM += [" ====  core engine      ==== {{{"]
 " =================================================
 
 function! VimIM(start, keyboard)
-let valid_keyboard = s:wubi ? s:valid_wubi_keyboard : s:valid_keyboard
+let valid_keyboard = s:valid_keyboard
 if a:start
     let cursor_positions = getpos(".")
     let start_row = cursor_positions[1]
@@ -2337,10 +2318,6 @@ else
         let results = s:vimim_get_cloud(keyboard, s:cloud)
     endif
     if empty(results)
-        if s:wubi && len(keyboard) > 4
-            let keyboard = strpart(keyboard, 4*((len(keyboard)-1)/4))
-            let s:keyboard = keyboard  " wubi auto insert on the 4th
-        endif  " [backend] plug-n-play embedded file/directory engine
         let results = s:vimim_embedded_backend_engine(keyboard)
     endif
     if len(s:english.line)
