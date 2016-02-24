@@ -1959,6 +1959,10 @@ function! s:vimim_reset_after_insert()
     let s:hjkl_h = 0    "  toggle cjk property
     let s:hjkl_l = 0    "  toggle label length
     let s:hjkl_m = 0    "  toggle cjjp/c'j'j'p
+
+    " 缓存上次的坐标
+    let s:cache_last_column = -1
+    let s:cache_last_row = -1
 endfunction
 
 " ============================================= }}}
@@ -1971,6 +1975,20 @@ if a:start
     let cursor_positions = getpos(".")
     let start_row = cursor_positions[1]
     let start_column = cursor_positions[2]-1
+    " 如果在翻页后，光标位置没有改动，表示没有新的输入，
+    " 否则，重置缓存
+    let results = s:vimim_cache()
+    echom "c" . s:cache_last_row . " " . s:cache_last_column
+    echom "s" . start_row . " " . start_column
+    if !empty(results) && s:cache_last_row == start_row && s:cache_last_column != start_column
+        " 重置缓存
+        echom "reset cache"
+        sil!call s:vimim_reset_before_omni()
+        sil!call s:vimim_reset_after_insert()
+    else
+        let s:cache_last_row = start_row
+        let s:cache_last_column = start_column
+    endif
     let current_line = getline(start_row)
     let before = current_line[start_column-1]
     let seamless_column = s:vimim_get_seamless(cursor_positions)
@@ -2014,12 +2032,15 @@ else
     if s:omni < 0  "  one_key_correction
         return [s:space]
     endif
+    " 如果进入选词的模式，即进行翻页，cache 中就会有值
+    " 但请注意，如果选词+翻页+输入新的字母，就会以后问题
     let results = s:vimim_cache()
     if empty(results)
         sil!call s:vimim_reset_before_omni()
     else
         return s:vimim_popupmenu_list(results)
     endif
+    " 进到这里，说明要进行词语匹配，而不是翻页
     let keyboard = a:keyboard
     if !empty(str2nr(keyboard)) " for digit input: 23554022100080204420
         let keyboard = get(split(s:keyboard),0)
