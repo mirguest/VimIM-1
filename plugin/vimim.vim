@@ -258,16 +258,6 @@ function! s:vimim_dictionary_punctuations()
     endif
 endfunction
 
-function! g:Vimim_slash()
-    let range = col(".") - 1 - s:starts.column
-    let chinese = strpart(getline("."), s:starts.column, range)
-    let word = substitute(chinese,'\w','','g')
-    let @/ = empty(word) ? @_ : word
-    let repeat_times = len(word) / s:multibyte
-    let key = repeat("\<Left>\<Delete>",repeat_times) . g:Vimim_esc()
-    sil!exe 'sil!return "' . key . '"'
-endfunction
-
 function! g:Vimim_bracket(offset)
     let cursor = ""
     let range = col(".") - 1 - s:starts.column
