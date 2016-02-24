@@ -2890,6 +2890,9 @@ if a:start
             elseif before == '\' " do nothing if leading bslash found
                 let s:pattern_not_found = 1
                 return last_seen_bslash_column
+            elseif before =~# '[A-Z]' " do nothing if found Abcd
+                let s:pattern_not_found = 1
+                return last_seen_bslash_column
             else
                 break
             endif
