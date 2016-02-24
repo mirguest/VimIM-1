@@ -205,94 +205,6 @@ function! s:vimim_set_global_default()
 endfunction
 
 " ============================================= }}}
-let s:VimIM += [" ====  easter eggs      ==== {{{"]
-" =================================================
-
-function! s:vimim_easter_chicken(keyboard)
-    try
-        return eval("s:vimim_egg_" . a:keyboard . "()")
-    catch
-        sil!call s:vimim_debug('egg', a:keyboard, v:exception)
-    endtry
-    return []
-endfunction
-
-function! s:vimim_egg_vimimhelp()
-    let eggs  = split(s:url)
-    let eggs += [''] + s:vimim_egg_vim()
-    let eggs += [''] + s:vimim_egg_vimimgame()
-    let eggs += [''] + s:vimim_egg_vimim()
-    let eggs += [''] + s:vimim_egg_vimimvim()
-    return map(eggs, 'v:val . " "')
-endfunction
-
-function! s:vimim_egg_vim()
-    return ["Vim　　文本編輯器", g:Vimim]
-endfunction
-
-function! s:vimim_egg_vimimgame()
-    let mahjong = "春夏秋冬 梅兰竹菊 中發白囍 東南西北"
-    return split(mahjong)
-endfunction
-
-function! s:vimim_egg_vimimvim()
-    let vimim_pprint_filter = "strpart(" . 'v:val' . ", 0, 29)"
-    return map(copy(s:VimIM), vimim_pprint_filter)
-endfunction
-
-function! s:vimim_egg_vimimrc()
-    let vimim = s:vimimdefaults + s:vimimrc
-    if g:Vimim_toggle > -1    " update g:Vimim_toggle if not closed
-        let filter = "get(" . 'v:val' . ",1)"
-        let g:Vimim_toggle = join(map(copy(s:ui.frontends),filter),",")
-        let toggle = match(vimim, 'g:Vimim_toggle')
-        let left = vimim[toggle][0 : 1 + match(vimim[toggle], '=')]
-        let vimim[toggle] = left . string(g:Vimim_toggle)
-    endif
-    return sort(vimim)
-endfunction
-
-function! s:vimim_egg_vimim()
-    let eggs = []
-    call add(eggs, s:chinese('date', s:colon) . s:today)
-    let os = "win32unix win32 win64 macunix unix x11"
-    for computer in split(os)
-        if has(computer) | let os = computer | break | endif
-    endfor
-    let time = reltimestr(g:Vimim_profile) . ' seconds'
-    call add(eggs, s:chinese('computer', s:colon) . os . time)
-    let revision = v:progname ."=". v:version
-    call add(eggs, s:chinese('revision', s:colon) . revision)
-    let encoding = s:chinese('encoding', s:colon) . &encoding
-    call add(eggs, encoding . s:space . &fileencodings)
-    call add(eggs, s:chinese('env', s:colon) . v:lc_time)
-    let db = s:chinese('database', s:colon)
-    let input = "VimIM" . s:space . s:vimim_im_chinese() . s:space
-    if len(s:cjk.filename)
-        let input .= s:chinese('4corner') . s:space
-        call add(eggs, db.s:chinese('cjk',s:colon).s:cjk.filename)
-    endif
-    if len(s:english.filename)
-        let input .= s:chinese('english') . s:space
-        call add(eggs, db.s:chinese('english').db.s:english.filename)
-    endif
-    for [root, im] in s:ui.frontends
-        let backend = s:backend[root][im]
-        if root == "cloud"
-
-        else
-            call add(eggs, db . backend.chinese . db . backend.name)
-        endif
-    endfor
-    let exe = s:http_exe =~ 'Python' ? '' : "HTTP executable: "
-    call add(eggs, s:chinese('network', s:colon) . exe . s:http_exe)
-    call add(eggs, s:chinese('input', s:colon) . input)
-    call add(eggs, s:chinese('option', s:colon) . 'vimimrc')
-    let results = map(eggs + s:vimim_egg_vimimrc(), 'v:val . " " ')
-    return results
-endfunction
-
-" ============================================= }}}
 let s:VimIM += [" ====  hjkl vimimgame   ==== {{{"]
 " =================================================
 
@@ -318,93 +230,6 @@ function! s:vimim_cache()
         endif
     endif
     return results
-endfunction
-
-function! s:vimim_get_hjkl_game(keyboard)
-    let keyboard = a:keyboard
-    let results = []
-    let poem = s:vimim_filereadable(keyboard)
-    if keyboard =~# '^i' && keyboard =~ '\d'
-        return s:vimim_imode_number(keyboard)
-    elseif keyboard ==# 'itoday' || keyboard ==# 'inow'
-        return [s:vimim_imode_today_now(keyboard)]
-    elseif keyboard == "''''''"
-        return split(join(s:vimim_egg_vimimgame(),""),'\zs')
-    elseif s:vimim_get_unicode_ddddd(keyboard)
-        return s:vimim_unicode_list(s:vimim_get_unicode_ddddd(keyboard))
-    elseif keyboard == "''"
-        let before = ''   " get one chinese char before
-        if !empty(len(s:vimim_left()))
-            let before = getline(".")[col(".")-1-s:multibyte : col(".")-2]
-        endif
-        if empty(before) || before !~ '[^\x00-\xff]'
-            if s:vimim_cjk() | return s:vimim_cjk_match('u') | endif
-            let before = nr2char(19968)  " the 214 standard unicode index
-        endif                            " gi ,.. space ,.. space
-        return s:vimim_unicode_list(char2nr(before))
-    elseif !empty(poem)
-        let results = s:vimim_readfile(poem) " [hjkl] file in hjkl folder
-    elseif keyboard ==# "vim" || keyboard =~# "^vimim"
-        let results = s:vimim_easter_chicken(keyboard)      " [hidden] egg
-    elseif keyboard =~# '\l\+' . "'" . '\{4}$'
-    elseif len(getreg('"')) > 3
-        if keyboard == "''''"      " visual: display buffer inside omni
-            let results = split(getreg('"'), '\n')
-        elseif keyboard =~ "'''''" " visual: display one-line-cjk property
-            let line = substitute(getreg('"'),'[\x00-\xff]','','g')
-            if len(line)
-                for chinese in split(line, '\zs')
-                    let menu  = s:vimim_cjk_property(chinese)
-                    let menu .= repeat(" ", 38-len(menu))
-                    call add(results, chinese . " " . menu)
-                endfor
-            endif
-        endif
-    endif
-    if len(results)
-        let s:touch_me_not = 1
-        if s:hjkl_m % 4
-            for i in range(s:hjkl_m % 4)
-                let results = s:vimim_hjkl_rotation(results)
-            endfor
-        endif
-        let results = [s:space] + results + [s:space]
-    endif
-    return results
-endfunction
-
-function! s:vimim_hjkl_rotation(lines)
-    let max = max(map(copy(a:lines), 'strlen(v:val)')) + 1
-    let multibyte = match(a:lines,'\w') < 0 ? s:multibyte : 1
-    let results = []
-    let rotations = []
-    for line in a:lines
-        let spaces = ''   " rotation makes more sense for cjk
-        if (max-len(line)) / multibyte
-            for i in range((max-len(line))/multibyte)
-                let spaces .= s:space
-            endfor
-        endif
-        let line .= spaces
-        call add(rotations, line)
-    endfor
-    for i in range(max/multibyte)
-        let column = ''
-        for line in reverse(copy(rotations))
-            let line = get(split(line,'\zs'), i)
-            if !empty(line) | let column .= line | endif
-        endfor
-        call add(results, column)
-    endfor
-    return results
-endfunction
-
-function! s:vimim_chinese_rotation() range abort
-    :%s#\s*\r\=$##
-    :let lines = getline(a:firstline, a:lastline)
-    :let lines = s:vimim_hjkl_rotation(lines)
-    :%d
-    :for line in lines | put=line | endfor
 endfunction
 
 " ============================================= }}}
@@ -2206,7 +2031,7 @@ else
         let s:english.line = s:vimim_get_english(keyboard)
     endif
     if s:mode.onekey || s:mode.windowless
-        let results = s:vimim_get_hjkl_game(keyboard)
+        let results = []
         if empty(results) && s:vimim_cjk()
             let head = s:vimim_get_no_quote_head(keyboard)
             let head = s:vimim_get_cjk_head(head)
@@ -2422,7 +2247,6 @@ function! s:vimim_plug_and_play()
             inoremap <silent> <Tab> <C-R>=g:Vimim_tab(0)<CR>
         endif
     endif
-    :com! -range=% ViMiM <line1>,<line2>call s:vimim_chinese_rotation()
     :com! -range=% VimIM <line1>,<line2>call s:vimim_chinese_transfer()
     :com! -nargs=* Debug :sil!call s:vimim_debug(<args>)
 endfunction
