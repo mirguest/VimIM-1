@@ -522,16 +522,6 @@ function! g:Vimim_bslash()
     sil!exe 'sil!return "' . key . '"'
 endfunction
 
-" ============================================= }}}
-let s:VimIM += [" ====  mode: windowless ==== {{{"]
-" =================================================
-
-function! g:Vimim_gi()
-    let s:mode = s:windowless
-    let key = s:vimim_start()
-    sil!exe 'sil!return "' . key . '"'
-endfunction
-
 function! g:Vimim_tab(gi)
     " (1) Tab in insert mode => start Tab or windowless/onekey
     " (2) Tab in pumvisible  => print out menu
@@ -2119,7 +2109,6 @@ function! s:vimim_plug_and_play()
     inoremap <unique> <C-_>  <C-R>=g:Vimim_chinese()<CR>
     inoremap <silent> <C-^>  <C-R>=g:Vimim_onekey()<CR>
     if g:Vimim_map !~ 'no-gi'
-        nnoremap <silent> gi a<C-R>=g:Vimim_gi()<CR>
             xmap <silent> gi  <C-^>
     endif
     if g:Vimim_map !~ 'no-search'
