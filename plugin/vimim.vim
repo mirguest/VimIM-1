@@ -1578,44 +1578,6 @@ function! s:vimim_set_backend_embedded()
     endfor
 endfunction
 
-function! s:vimim_sort_on_length(i1, i2)
-    return len(a:i2) - len(a:i1)
-endfunc
-
-function! s:vimim_search_chinese_by_english(key)
-    let key = tolower(a:key)
-    let results = []
-    " 1/3 first try search from mycloud or cloud if available
-    " 2/3 search unicode or cjk /search unicode /u808f
-    let ddddd = s:vimim_get_unicode_ddddd(key)
-    if !empty(ddddd)
-        let results = [nr2char(ddddd)]
-    elseif s:vimim_cjk()
-        while len(key) > 1
-            let head = s:vimim_get_cjk_head(key)
-            if empty(head)  " /muuqwxeyqpjeqqq
-                break       " /m7712x3610j3111
-            else            " /ma77xia36ji31
-                let matches = s:vimim_cjk_match(head)
-                if len(matches)
-                    let chinese = join(matches[:9], '')
-                    call add(results, "[" . chinese . "]")
-                endif
-                let key = strpart(key, len(head))
-            endif
-        endwhile
-        let results = len(results) > 1 ? [join(results,'')] : results
-    endif
-    if len(results) | return results | endif
-    " 3/3 search datafile and english: /ma and /horse
-    let key = tolower(a:key)
-    let results = split(s:vimim_get_english(key))
-    if empty(results)
-        let results = s:vimim_embedded_backend_engine(key)
-    endif
-    return results
-endfunction
-
 " ============================================= }}}
 let s:VimIM += [" ====  core workflow    ==== {{{"]
 " =================================================
