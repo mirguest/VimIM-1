@@ -668,80 +668,6 @@ function! s:vimim_screenshot()
     sil!exe 'sil!return "' . key . '"'
 endfunction
 
-" ============================================= }}}
-let s:VimIM += [" ====  mode: onekey     ==== {{{"]
-" =================================================
-
-function! g:Vimim_onekey()
-    " (1) OneKey in insert  mode => start omni popup mode
-    " (2) OneKey in onekey  mode => close omni popup mode
-    " (3) OneKey in chinese mode => switch to the next im
-    " (4) OneKey in pumvisible   => print out menu
-    let key = ''
-    if pumvisible()
-        let key = s:vimim_screenshot()
-    elseif empty(s:ctrl6)
-        let key = s:vimim_start() . s:vimim_onekey_action()
-    elseif s:mode.onekey
-        let key = s:vimim_stop()
-    else
-        let s:toggle_im += 1
-        let switch = s:toggle_im % len(s:ui.frontends)
-        let s:ui.root = get(get(s:ui.frontends, switch), 0)
-        let s:ui.im   = get(get(s:ui.frontends, switch), 1)
-        let key = s:vimim_start()
-    endif
-    sil!exe 'sil!return "' . key . '"'
-endfunction
-
-function! s:vimim_onekey_action()
-    let key = s:vimim_onekey_evils()
-    if empty(key)
-        if s:vimim_left()
-            let key = g:Vimim()
-        elseif s:mode.windowless
-            let key = s:vimim_windowless("")
-        endif
-    endif
-    sil!exe 'sil!return "' . key . '"'
-endfunction
-
-function! s:vimim_onekey_evils()
-    let key = ""  " punctuations can be made not so evil ..
-    let one = getline(".")[col(".")-2]    " one byte before
-    let two = getline(".")[col(".")-3]    " two byte before
-    let onekey_evils = copy(s:all_evils)
-    call extend(onekey_evils, s:key_evils)
-    if getline(".")[col(".")-3 : col(".")-2] == ".." " before_before
-        " [game] dot dot => quotes => popup menu
-        let three = getline(".")[col(".")-4]
-        if col(".") < 5 || empty(three) || three =~ '\s'
-            let key = "''''''"   "  <=    .. plays mahjong
-        elseif three =~# "[0-9a-z]"
-            let key = "'''"      "  <=  xx.. plays hjkl_m
-        else
-            let key = "''"       "  <=  香.. plays same cjk
-        endif
-        let key = "\<BS>\<BS>" . key . '\<C-R>=g:Vimim()\<CR>'
-    elseif one == "'" && two =~ "[a-z']" " force cloud
-    elseif one =~# "[0-9a-z]" || one =~# '\s' || empty(one)
-    elseif two =~# "[0-9a-z]" || one =~# '\u'
-        let key = " "  " ma,space => ma, space
-    elseif has_key(onekey_evils, one)
-        for char in keys(onekey_evils)
-            if two ==# char || two =~# '\u'
-                return " " " no transfer if punctuation punctuation
-            endif
-        endfor
-        let bs = onekey_evils[one]  " make Chinese punctuation
-        if one == '"' || one == '"'
-            let bs .= '\<Left>'
-        endif
-        let key = "\<Left>\<Delete>" . bs
-    endif
-    sil!exe 'sil!return "' . key . '"'
-endfunction
-
 function! s:vimim_get_no_quote_head(keyboard)
     let keyboard = a:keyboard
     if keyboard =~ '\d' 
@@ -2107,10 +2033,6 @@ let s:VimIM += [" ====  core driver      ==== {{{"]
 function! s:vimim_plug_and_play()
     nnoremap <silent> <C-_> i<C-R>=g:Vimim_chinese()<CR><Esc>
     inoremap <unique> <C-_>  <C-R>=g:Vimim_chinese()<CR>
-    inoremap <silent> <C-^>  <C-R>=g:Vimim_onekey()<CR>
-    if g:Vimim_map !~ 'no-gi'
-            xmap <silent> gi  <C-^>
-    endif
     if g:Vimim_map !~ 'no-search'
         nnoremap <silent> n :call g:Vimim_search()<CR>n
     endif
