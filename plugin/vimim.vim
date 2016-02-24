@@ -56,7 +56,6 @@ function! s:vimim_initialize_debug()
     let s:plugon = simplify(s:plugin . '/../../../hjkl/')
     if empty(&cp) && exists('s:plugon') && isdirectory(s:plugon)
         let g:Vimim_map = 'tab_as_gi'
-        let g:Vimim_cloud = 'google,sogou,baidu,qq'
     endif
 endfunction
 
@@ -1765,18 +1764,6 @@ function! s:vimim_more_pinyin_candidates(keyboard)
     return candidates
 endfunction
 
-function! s:vimim_cloud_pinyin(keyboard, match_list)
-    let match_list = []
-    let keyboards = s:vimim_get_pinyin(a:keyboard)
-    for chinese in a:match_list
-        let len_chinese = len(split(chinese,'\zs'))
-        let english = join(keyboards[len_chinese :], "")
-        let pair = empty(english) ? chinese : chinese.english
-        call add(match_list, pair)
-    endfor
-    return match_list
-endfunction
-
 " ============================================= }}}
 let s:VimIM += [" ====  python2 python3  ==== {{{"]
 " =================================================
@@ -2015,12 +2002,6 @@ function! s:vimim_search_chinese_by_english(key)
     let key = tolower(a:key)
     let results = []
     " 1/3 first try search from mycloud or cloud if available
-    if s:ui.im == 'mycloud'
-        let results = s:vimim_get_mycloud(key)
-    elseif s:ui.root == 'cloud' || key[-1:] == "'"
-        let results = s:vimim_get_cloud(key, s:cloud)
-    endif
-    if len(results) | return results | endif
     " 2/3 search unicode or cjk /search unicode /u808f
     let ddddd = s:vimim_get_unicode_ddddd(key)
     if !empty(ddddd)
@@ -2239,19 +2220,6 @@ else
             let keyboard = s:vimim_get_no_quote_head(keyboard)
         endif
     endif
-    if s:ui.im == "mycloud"
-        let results = s:vimim_get_mycloud(keyboard)
-        if len(results)
-            let s:show_extra_menu = 1
-            return s:vimim_popupmenu_list(results)
-        else  " flat failure from mycloud
-            sil!call s:vimim_debug('mycloud fatal', keyboard, v:exception)
-            return []
-        endif
-    endif
-    if s:ui.root == 'cloud' || keyboard[-1:] == "'" && empty(s:ui.quote)
-        let results = s:vimim_get_cloud(keyboard, s:cloud)
-    endif
     if empty(results)
         let results = s:vimim_embedded_backend_engine(keyboard)
     endif
@@ -2264,9 +2232,6 @@ else
             if len(keyboard) > 1
                 let shoupin = s:vimim_get_no_quote_head(keyboard."'''")
                 let results = s:vimim_cjk_match(shoupin)
-                if empty(results)
-                    let results = s:vimim_get_cloud(keyboard, s:cloud)
-                endif
             else
                 let results = [keyboard == 'i' ? "我" : s:space]
             endif
