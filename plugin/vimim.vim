@@ -1978,11 +1978,11 @@ if a:start
     " 如果在翻页后，光标位置没有改动，表示没有新的输入，
     " 否则，重置缓存
     let results = s:vimim_cache()
-    echom "c" . s:cache_last_row . " " . s:cache_last_column
-    echom "s" . start_row . " " . start_column
+    "echom "c" . s:cache_last_row . " " . s:cache_last_column
+    "echom "s" . start_row . " " . start_column
     if !empty(results) && s:cache_last_row == start_row && s:cache_last_column != start_column
         " 重置缓存
-        echom "reset cache"
+        "echom "reset cache"
         sil!call s:vimim_reset_before_omni()
         sil!call s:vimim_reset_after_insert()
     else
@@ -2050,9 +2050,9 @@ else
     else   " [english] first check if it is english or not
         let s:english.line = s:vimim_get_english(keyboard)
     endif
-    echom "s:english.line: " . s:english.line
-    echom "s:mode.onekey: " . s:mode.onekey
-    echom "s:mode.windowless: " . s:mode.windowless
+    "echom "s:english.line: " . s:english.line
+    "echom "s:mode.onekey: " . s:mode.onekey
+    "echom "s:mode.windowless: " . s:mode.windowless
     if s:mode.onekey || s:mode.windowless
         let results = []
         if empty(results) && s:vimim_cjk()
@@ -2068,12 +2068,12 @@ else
             let keyboard = s:vimim_get_no_quote_head(keyboard)
         endif
     endif
-    echom "results: " . len(results)
+    "echom "results: " . len(results)
     " 首先查找内置的引擎
     if empty(results)
         let results = s:vimim_embedded_backend_engine(keyboard)
     endif
-    echom "results: " . len(results)
+    "echom "results: " . len(results)
     " 如果有英文匹配，追加结果
     if len(s:english.line)
         let s:keyboard = s:keyboard !~ "'" ? keyboard : s:keyboard
@@ -2091,15 +2091,15 @@ else
             let s:pattern_not_found = 1
         endif
     endif
-    echom "最后要返回的 results " . string(results)
+    "echom "最后要返回的 results " . string(results)
     return s:vimim_popupmenu_list(results)
 endif
 endfunction
 
 function! s:vimim_popupmenu_list(lines)
     let s:match_list = a:lines
-    echom "进入函数 s:vimim_popupmenu_list: " 
-    echom "s:keyboard: " . string(s:keyboard)
+    "echom "进入函数 s:vimim_popupmenu_list: " 
+    "echom "s:keyboard: " . string(s:keyboard)
     let keyboards = split(s:keyboard)  " mmmm => ['m',"m'm'm"]
     let keyboard = join(keyboards,"")
     let keyboard_left = get(keyboards,0)
@@ -2108,7 +2108,7 @@ function! s:vimim_popupmenu_list(lines)
     if empty(a:lines) || type(a:lines) != type([])
         return []
     elseif s:vimim_cjk() && len(s:hjkl)
-        echom "进入 s:vimim_cjk() && len(s:hjkl) "
+        "echom "进入 s:vimim_cjk() && len(s:hjkl) "
         let results = []  " use 1234567890 as filter for windowless
         for chinese in a:lines
             if s:vimim_cjk_in_4corner(chinese,0)
@@ -2126,7 +2126,7 @@ function! s:vimim_popupmenu_list(lines)
     let s:popup_list = []
     " 开始循环
     for chinese in s:match_list
-        echom "循环: " . chinese
+        "echom "循环: " . chinese
         let complete_items = {}
         if s:vimim_cjk() && s:hjkl__ && s:hjkl__%2
             let simplified_traditional = ""
@@ -2136,7 +2136,7 @@ function! s:vimim_popupmenu_list(lines)
             let chinese = simplified_traditional
         endif
         let titleline = s:vimim_get_label(label)
-        echom "  titleline: " . titleline
+        "echom "  titleline: " . titleline
         if empty(s:touch_me_not)
             let menu = ""
             let pairs = split(chinese)
@@ -2148,7 +2148,7 @@ function! s:vimim_popupmenu_list(lines)
                 " 应该把 keyboard 中的 pair_left 扣除,
                 " 这样就可以把剩下的字符添加到汉字尾部
                 let temptail = substitute(keyboard_left, pair_left,'','g')
-                echom "    temptail: " . temptail 
+                "echom "    temptail: " . temptail 
                 let chinese = get(pairs,1).temptail
                 let menu = s:show_extra_menu ? pair_left : menu
             endif
@@ -2191,11 +2191,11 @@ function! s:vimim_embedded_backend_engine(keyboard)
     if empty(s:ui.im) || empty(s:ui.root)
         return []
     endif
-    echom "核心代码"
+    "echom "核心代码"
     let head = 0
     let results = []
     let backend = s:backend[s:ui.root][s:ui.im]
-    echom string(backend)
+    "echom string(backend)
     if backend.name =~ "quote" && keyboard !~ "[']" " has apostrophe
         let keyboard = s:vimim_quanpin_transform(keyboard)
     endif
@@ -2218,12 +2218,12 @@ function! s:vimim_embedded_backend_engine(keyboard)
             endif
             " 这里返回的 head 要怎么用才好呢?
             let head = s:vimim_get_stone_from_bsddb(keyboard)
-            echom "head: " . head
+            "echom "head: " . head
             " head 与 results 中的开头不一定匹配
             if !empty(head)
                 let results = s:vimim_get_from_database(head)
             endif
-            echom "results: " . string(results)
+            "echom "results: " . string(results)
         else
             if empty(backend.lines)
                 let backend.lines = s:vimim_readfile(backend.name)
@@ -2233,8 +2233,8 @@ function! s:vimim_embedded_backend_engine(keyboard)
         endif
     endif
     if s:keyboard !~ '\S\s\S'
-        echom "这时的 s:keyboard 为: " . s:keyboard
-        echom "同时 head 为: " . head
+        "echom "这时的 s:keyboard 为: " . s:keyboard
+        "echom "同时 head 为: " . head
         " 这时的 s:keyboard 为: zhongwenru
         " 同时 head 为: zhongwen
         "
@@ -2248,14 +2248,14 @@ function! s:vimim_embedded_backend_engine(keyboard)
             let tail = strpart(keyboard,len(head))
             let s:keyboard = head . " " . tail
         endif
-        echom "更新后 s:keyboard 为: " . s:keyboard
-        echom "更新后 head 为: " . head
+        "echom "更新后 s:keyboard 为: " . s:keyboard
+        "echom "更新后 head 为: " . head
         " 更新后 s:keyboard 为: zhongwen ru
         " 更新后 head 为: zhongwen
         "
         " 我的想法是，这个时候不应该更新，而是应该等到选词的时候
     endif
-    echom "return results: " . string(results)
+    "echom "return results: " . string(results)
     return results
 endfunction
 
