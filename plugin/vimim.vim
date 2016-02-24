@@ -243,7 +243,7 @@ function! s:vimim_dictionary_statusline()
     let two .= " 标准字库,標準字庫 自然码,自然碼"
     let one .= " computer database option flypy network env "
     let one .= " encoding ms static dynamic erbi hangul xinhua"
-    let one .= " zhengma cangjie yong wu shuangpin"
+    let one .= " zhengma cangjie yong wu "
     let two .= " 电脑,電腦 词库,詞庫 选项,選項 小鹤,小鶴 联网,聯網 云,雲 "
     let two .= " 环境,環境 编码,編碼 微软,微軟 静态,靜態 动态,動態"
     let two .= " 二笔,二筆 五笔,五筆 韩文,韓文 新华,新華 郑码,鄭碼"
@@ -1931,7 +1931,6 @@ function! s:vimim_super_reset()
 endfunction
 
 function! s:vimim_reset_before_anything()
-    let s:has_shuangpin_transform = 0   " todo
     let s:mode = s:onekey
     let s:keyboard = ""
     let s:omni = 0
