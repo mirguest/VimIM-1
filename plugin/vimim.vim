@@ -2263,4 +2263,3 @@ sil!call s:vimim_set_im_toggle_list()
 sil!call s:vimim_plug_and_play()
 :let g:Vimim_profile = reltime(g:Vimim_profile)
 " ============================================= }}}
-Debug s:vimim_egg_vimim()
