@@ -119,14 +119,12 @@ function! s:vimim_initialize_global()
     let s:shengmu_list = split('b p m f d t l n g k h j q x r z c s y w')
     let s:pumheights = { 'current' : &pumheight, 'saved' : &pumheight }
     let s:smart_quotes = { 'single' : 1, 'double' : 1 }
-    let s:backend = { 'cloud' : {}, 'datafile' : {}, 'directory' : {} }
+    let s:backend = { 'datafile' : {}, 'directory' : {} }
     let s:ui = { 'root' : '', 'im' : '', 'quote' : 0, 'frontends' : [] }
     let s:rc = {}
     let s:rc["g:Vimim_mode"] = 'dynamic'
     let s:rc["g:Vimim_map"] = ''
     let s:rc["g:Vimim_toggle"] = 0
-    let s:rc["g:Vimim_cloud"] = 'baidu,sogou,qq,google'
-    let s:rc["g:Vimim_mycloud"] = 0
     let s:rc["g:Vimim_plugin"] = s:plugin
     let s:rc["g:Vimim_punctuation"] = 2
     call s:vimim_set_global_default()
@@ -140,8 +138,7 @@ endfunction
 
 function! s:vimim_dictionary_keycodes()
     let s:keycodes = {}
-    let cloud = ' google sogou baidu qq mycloud '
-    for key in split( cloud . ' pinyin ')
+    for key in split( ' pinyin ')
         let s:keycodes[key] = "['a-z0-9]"
     endfor
     for key in split('array30 phonetic')
@@ -162,7 +159,6 @@ endfunction
 
 function! s:vimim_set_frontend()
     let quote = 'erbi wu nature yong boshiamy'   " quote in datafile
-    let cloud = get(split(g:Vimim_cloud,','), 0) " default cloud
     let s:valid_keyboard = "[0-9a-z']"
     if !empty(s:ui.root)
         let s:valid_keyboard = s:backend[s:ui.root][s:ui.im].keycode
@@ -281,17 +277,15 @@ function! s:vimim_egg_vimim()
         let input .= s:chinese('english') . s:space
         call add(eggs, db.s:chinese('english').db.s:english.filename)
     endif
-    let cloud = db . s:chinese('cloud') . db
     for [root, im] in s:ui.frontends
         let backend = s:backend[root][im]
         if root == "cloud"
-            let cloud .= backend.name . s:chinese('cloud') . s:space
+
         else
             call add(eggs, db . backend.chinese . db . backend.name)
         endif
     endfor
     let exe = s:http_exe =~ 'Python' ? '' : "HTTP executable: "
-    call add(eggs, cloud)
     call add(eggs, s:chinese('network', s:colon) . exe . s:http_exe)
     call add(eggs, s:chinese('input', s:colon) . input)
     call add(eggs, s:chinese('option', s:colon) . 'vimimrc')
@@ -354,7 +348,6 @@ function! s:vimim_get_hjkl_game(keyboard)
     elseif keyboard ==# "vim" || keyboard =~# "^vimim"
         let results = s:vimim_easter_chicken(keyboard)      " [hidden] egg
     elseif keyboard =~# '\l\+' . "'" . '\{4}$'
-        let results = s:vimim_get_all_clouds(keyboard[:-5]) " fuck''''
     elseif len(getreg('"')) > 3
         if keyboard == "''''"      " visual: display buffer inside omni
             let results = split(getreg('"'), '\n')
@@ -424,7 +417,7 @@ function! s:vimim_dictionary_statusline()
     let two  = " 点石成金,點石成金 新世纪,新世紀 太极码,太極碼"
     let two .= " 四角号码,四角號碼 呒虾米,嘸蝦米 输入,輸入"
     let two .= " 标准字库,標準字庫 自然码,自然碼"
-    let one .= " computer database option flypy network cloud env "
+    let one .= " computer database option flypy network env "
     let one .= " encoding ms static dynamic erbi hangul xinhua"
     let one .= " zhengma cangjie yong wu shuangpin"
     let two .= " 电脑,電腦 词库,詞庫 选项,選項 小鹤,小鶴 联网,聯網 云,雲 "
@@ -432,7 +425,7 @@ function! s:vimim_dictionary_statusline()
     let two .= " 二笔,二筆 五笔,五筆 韩文,韓文 新华,新華 郑码,鄭碼"
     let two .= " 仓颉,倉頡 永码,永碼 吴语,吳語 极点,極點 双拼,雙拼"
     let one .= " hit fullwidth halfwidth english chinese purple plusplus"
-    let one .= " quick mycloud pin pinyin phonetic array30"
+    let one .= " quick pin pinyin phonetic array30"
     let one .= " abc revision date google baidu sogou qq "
     let two .= " 打 全角 半角 英文 中文 紫光 加加 速成 海峰 自己的 98"
     let two .= " 拼 拼音 注音 行列 智能 版本 日期 谷歌 百度 搜狗 ＱＱ"
@@ -932,9 +925,6 @@ function! g:Vimim_onekey()
         let switch = s:toggle_im % len(s:ui.frontends)
         let s:ui.root = get(get(s:ui.frontends, switch), 0)
         let s:ui.im   = get(get(s:ui.frontends, switch), 1)
-        if s:ui.root == 'cloud' && s:ui.im != 'mycloud'
-            let s:cloud = s:ui.im
-        endif
         let key = s:vimim_start()
     endif
     sil!exe 'sil!return "' . key . '"'
@@ -991,7 +981,7 @@ endfunction
 
 function! s:vimim_get_no_quote_head(keyboard)
     let keyboard = a:keyboard
-    if keyboard =~ '\d' || s:ui.root == 'cloud'
+    if keyboard =~ '\d' 
         return keyboard
     endif
     if s:hjkl_m && s:hjkl_m % 2 || keyboard =~ '^\l\l\+'."'''".'$'
@@ -1835,61 +1825,6 @@ function! s:vimim_get_gold_from_bsddb(stone)
 try:
     gold = getgold(vim.eval('a:stone'))
     vim.command("return '%s'" % gold)
-except vim.error:
-    print("vim error: %s" % vim.error)
-EOF
-return ""
-endfunction
-
-function! s:vimim_get_from_python2(input, cloud)
-:sil!python << EOF
-import vim, urllib2, socket
-cloud = vim.eval('a:cloud')
-input = vim.eval('a:input')
-encoding = vim.eval("&encoding")
-try:
-    socket.setdefaulttimeout(20)
-    urlopen = urllib2.urlopen(input, None)
-    response = urlopen.read()
-    res = "'" + str(response) + "'"
-    if cloud == 'qq':
-        if encoding != 'utf-8':
-            res = unicode(res, 'utf-8').encode('utf-8')
-    elif cloud == 'google':
-        if encoding != 'utf-8':
-            res = unicode(res, 'unicode_escape').encode("utf8")
-    elif cloud == 'baidu':
-        if encoding != 'utf-8':
-            res = str(response)
-        else:
-            res = unicode(response, 'gbk').encode(encoding)
-        vim.command("let g:Baidu = %s" % res)
-    vim.command("return %s" % res)
-    urlopen.close()
-except vim.error:
-    print("vim error: %s" % vim.error)
-EOF
-return ""
-endfunction
-
-function! s:vimim_get_from_python3(input, cloud)
-:sil!python3 << EOF
-import vim, urllib.request
-try:
-    cloud = vim.eval('a:cloud')
-    input = vim.eval('a:input')
-    urlopen = urllib.request.urlopen(input)
-    response = urlopen.read()
-    if cloud != 'baidu':
-        res = "'" + str(response.decode('utf-8')) + "'"
-    else:
-        if vim.eval("&encoding") != 'utf-8':
-            res = str(response)[2:-1]
-        else:
-            res = response.decode('gbk')
-        vim.command("let g:Baidu = %s" % res)
-    vim.command("return %s" % res)
-    urlopen.close()
 except vim.error:
     print("vim error: %s" % vim.error)
 EOF
