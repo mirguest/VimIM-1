@@ -522,7 +522,6 @@ function! g:Vimim_tab(gi)
         let key = s:vimim_screenshot()
     else
         let s:mode = a:gi? s:windowless : s:onekey
-        let key = s:vimim_start() . s:vimim_onekey_action()
     endif
     sil!exe 'sil!return "' . key . '"'
 endfunction
@@ -579,8 +578,6 @@ function! g:Vimim_space()
         let key = ''                       " gi m space (the 1st choice)
         let s:gi_dynamic_on = 1            " gi m ;     (the 2nd choice)
         call s:vimim_set_title(g:Vimim)     " gi m '     (the 3rd choice)
-    else
-        let key = s:vimim_onekey_action()
     endif
     call s:vimim_reset_after_insert()
     sil!exe 'sil!return "' . key . '"'
