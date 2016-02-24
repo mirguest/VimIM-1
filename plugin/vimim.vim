@@ -351,11 +351,6 @@ endfunction
 function! g:Vimim_esc()
     let key = nr2char(27)  "  <Esc> is <Esc> if onekey or windowless
     if s:mode.windowless || s:mode.onekey
-        if has("gui_running")
-            sil!let @+ = getline(".")          " <Esc> to clipboard
-        endif
-        sil!let key = s:vimim_stop() . key     " <Esc> to escape
-        sil!call s:vimim_set_title(s:space . getline("."))
     elseif pumvisible()
         let key = g:Vimim_one_key_correction() " <Esc> as correction
     endif
@@ -611,10 +606,6 @@ function! g:Vimim_one_key_correction()
     " :help i_CTRL-U  Delete all entered characters ...
     let key = nr2char(21)
     if s:mode.windowless || s:mode.static && pumvisible()
-        if s:omni " one_key_correction " gi m space a space ctrl+u
-            let s:omni = -1            " gi mamahuhu space ctrl+u ctrl+u
-            let key  = '\<C-E>\<C-R>=g:Vimim()\<CR>\<Left>\<Delete>'
-        endif
     elseif pumvisible()
         let range = col(".") - 1 - s:starts.column
         let key = '\<C-E>' . repeat("\<Left>\<Delete>", range)
