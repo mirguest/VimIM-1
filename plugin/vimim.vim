@@ -1578,31 +1578,6 @@ function! s:vimim_set_backend_embedded()
     endfor
 endfunction
 
-" ============================================= }}}
-let s:VimIM += [" ====  /search          ==== {{{"]
-" =================================================
-
-function! g:Vimim_search()
-    let results = []
-    let english = @/
-    if len(english) > 1 && len(english) < 20 && english !~ "[^0-9a-z']"
-    \&& v:errmsg =~# english && v:errmsg =~# '^E486: '
-        try
-            let results = s:vimim_search_chinese_by_english(english)
-        catch
-            sil!call s:vimim_debug('slash search /', v:exception)
-        endtry
-    endif
-    if !empty(results)
-        let results = split(substitute(join(results),'\w','','g'))
-        call sort(results, "s:vimim_sort_on_length")
-        let slash = join(results[0:9], '\|')
-        let @/ = empty(search(slash,'nw')) ? english : slash
-    endif
-    echon "/" . english
-    let v:errmsg = ""
-endfunction
-
 function! s:vimim_sort_on_length(i1, i2)
     return len(a:i2) - len(a:i1)
 endfunc
@@ -2033,9 +2008,6 @@ let s:VimIM += [" ====  core driver      ==== {{{"]
 function! s:vimim_plug_and_play()
     nnoremap <silent> <C-_> i<C-R>=g:Vimim_chinese()<CR><Esc>
     inoremap <unique> <C-_>  <C-R>=g:Vimim_chinese()<CR>
-    if g:Vimim_map !~ 'no-search'
-        nnoremap <silent> n :call g:Vimim_search()<CR>n
-    endif
     if g:Vimim_map =~ 'c-bslash'      " use Ctrl-\  ''
         imap <C-Bslash> <C-_>
         nmap <C-Bslash> <C-_>
