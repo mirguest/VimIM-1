@@ -809,56 +809,6 @@ function! s:vimim_cjk_property(chinese)
     return unicode
 endfunction
 
-function! s:vimim_cjk_match(key)
-    let key = a:key
-    if empty(key) || empty(s:vimim_cjk()) | return [] | endif
-    let grep = ""
-    let grep_frequency = '.*' . '\s\d\+$'
-    if key =~ '\d'
-        if key =~# '^\l\l\+[1-4]\>'
-            let grep = key . '[a-z ]'  " cjk pinyin: huan2hai2 yi1
-        else
-            let digit = ""
-            if key =~ '^\d\+' && key !~ '[^0-9]'
-                let digit = key        " free style digit: 7 77 771 7712
-            elseif key =~# '^\l\+\d\+' " free style: ma7 ma77 ma771 ma7712
-                let digit = substitute(key,'\a','','g')
-            endif
-            if !empty(digit)
-                let space = '\d\{' . string(4-len(digit)) . '}'
-                let space = len(digit)==4 ? "" : space
-                let grep = '\s\+' . digit . space . '\s'
-                let alpha = substitute(key,'\d','','g')
-                if len(alpha)
-                    let grep .= '\(\l\+\d\)\=' . alpha " le|yue: le4yue4
-                elseif len(key) == 1
-                    let grep .= grep_frequency   " grep l|y: happy music
-                endif
-            endif
-        endif
-    elseif s:ui.im != 'mycloud'
-        if len(key) == 1   " one cjk by frequency y72/yue72 l72/le72
-            let grep = '[ 0-9]' . key . '\l*\d' . grep_frequency
-            let grep = key == 'u' ? ' u\( \|$\)' : grep  " 214 unicode
-        elseif key =~# '^\l\+'  " cjk list: /huan /hai /yet /huan2 /hai2
-            let grep = '[ 0-9]' . key . '[0-9]'
-        endif
-    endif
-    let results = []
-    if !empty(grep)
-        let line = match(s:cjk.lines, grep)
-        while line > -1
-            let fields = split(get(s:cjk.lines, line))
-            let frequency = get(fields,-1)=~'\l' ? 9999 : get(fields,-1)
-            call add(results, get(fields,0) . ' ' . frequency)
-            let line = match(s:cjk.lines, grep, line+1)
-        endwhile
-    endif
-    let results = sort(results, "s:vimim_sort_on_last")
-    let filter = "strpart(" . 'v:val' . ", 0, s:multibyte)"
-    return map(results, filter)
-endfunction
-
 function! s:vimim_get_cjk_head(key)
     let key = a:key
     if empty(s:cjk.filename) || key =~ "'" | return "" | endif
