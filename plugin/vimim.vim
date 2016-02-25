@@ -457,18 +457,6 @@ function! g:Vimim_bslash()
     sil!exe 'sil!return "' . key . '"'
 endfunction
 
-function! g:Vimim_tab(gi)
-    " (1) Tab in insert mode => start Tab or windowless/onekey
-    " (2) Tab in pumvisible  => print out menu
-    let key = "\t"
-    if empty(len(s:vimim_left()))
-    elseif pumvisible() || s:ctrl6
-        let @0 = getline(".")  " undo if dump out by accident
-        let key = s:vimim_screenshot()
-    endif
-    sil!exe 'sil!return "' . key . '"'
-endfunction
-
 function! g:Vimim_pagedown()
     let key = ' '
     if pumvisible()
@@ -541,30 +529,6 @@ function! g:Vimim_backspace()
     let s:omni = 0  " disable active omni completion state
     let key = pumvisible() ? '\<C-R>=g:Vimim()\<CR>' : ''
     let key = '\<Left>\<Delete>' . key
-    sil!exe 'sil!return "' . key . '"'
-endfunction
-
-function! s:vimim_screenshot()
-    let keyboard = get(split(s:keyboard),0)
-    let space = repeat(" ", virtcol(".")-len(keyboard)-1)
-    if s:keyboard =~ '^vim'
-        let space = ""  " no need to format if it is egg
-    elseif !empty(s:keyboard)
-        call setline(".", keyboard)
-    endif
-    let saved_position = getpos(".")
-    for items in s:popup_list
-        let line = printf('%s', items.word)
-        if has_key(items, "abbr")
-            let line = printf('%s', items.abbr)
-            if has_key(items, "menu")
-                let line = printf('%s  %s', items.abbr, items.menu)
-            endif
-        endif
-        put=space.line
-    endfor
-    call setpos(".", saved_position)
-    let key = g:Vimim_esc()
     sil!exe 'sil!return "' . key . '"'
 endfunction
 
@@ -1795,14 +1759,6 @@ function! s:vimim_plug_and_play()
     elseif g:Vimim_map =~ 'm-space'   " use Alt-Space
         imap <M-Space> <C-_>
         nmap <M-Space> <C-_>
-    endif
-    if g:Vimim_map =~ 'tab'           " use Tab
-        xmap <silent> <Tab> <C-^>
-        if g:Vimim_map =~ 'tab_as_gi'
-            inoremap <silent> <Tab> <C-R>=g:Vimim_tab(1)<CR>
-        elseif g:Vimim_map =~ 'tab_as_onekey'
-            inoremap <silent> <Tab> <C-R>=g:Vimim_tab(0)<CR>
-        endif
     endif
     :com! -range=% VimIM <line1>,<line2>call s:vimim_chinese_transfer()
     :com! -nargs=* Debug :sil!call s:vimim_debug(<args>)
