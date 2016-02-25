@@ -721,12 +721,6 @@ function! s:vimim_unicode_to_utf8(xxxx)
     return utf8
 endfunction
 
-function! s:vimim_rot13(keyboard)
-    let a = "12345abcdefghijklmABCDEFGHIJKLM"
-    let z = "98760nopqrstuvwxyzNOPQRSTUVWXYZ"
-    return tr(a:keyboard, a.z, z.a)
-endfunction
-
 function! s:vimim_left()
     let key = 0   " validate the character on the left of the cursor
     let one_byte_before = getline(".")[col(".")-2]
