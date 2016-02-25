@@ -306,7 +306,6 @@ function! s:vimim_set_title(title)
     endif
     if &term == 'screen'
         if s:mode.windowless
-           let &l:statusline = '%{"'. a:title .'"}%<'
         else
            let &l:statusline = g:Vimim .' %h%m%r%=%-14.(%l,%c%V%) %P %<%f'
         endif
@@ -320,32 +319,6 @@ function! s:vimim_im_chinese()
     let backend = s:backend[s:ui.root][s:ui.im]
     let title = has_key(s:keycodes, s:ui.im) ? backend.chinese : ''
     return title
-endfunction
-
-function! s:vimim_windowless_titlestring(cursor)
-    let logo = "VimIM"
-    let west = s:all_evils['[']
-    let east = s:all_evils[']']
-    let title = substitute(s:windowless_title, west.'\|'.east, ' ', 'g')
-    if title !~ '\s\+' . "'" . '\+\s\+'
-        let title = substitute(title,"'",'','g')
-    endif
-    let title = substitute(title, '\s\*\=\d\=\s', ' ', '')
-    let words = split(title)[1:]
-    let cursor = s:cursor_at_windowless + a:cursor
-    let hightlight = get(words, cursor)
-    if !empty(hightlight) && len(words) > 1
-        let west  = join(words[1 : cursor-1]) . west
-        let east .= join(words[cursor+1 :])
-        let s:cursor_at_windowless = cursor
-        let keyboard = get(words,0)=='0' ? "" : get(words,0)
-        let star = len(s:english.line) ? '*' : ''
-        if empty(s:mode.windowless) || empty(s:cjk.filename)
-            let logo .= s:space . s:vimim_im_chinese()
-        endif
-        let logo .= ' '. keyboard .' '. star . west . hightlight . east
-    endif
-    sil!call s:vimim_set_title(logo)
 endfunction
 
 function! g:Vimim_esc()
@@ -366,8 +339,6 @@ function! g:Vimim_cycle_vimim()
         let s:mode = s:mode.windowless ? s:onekey  :
                    \ s:mode.onekey     ? s:dynamic :
                    \ s:mode.dynamic    ? s:static  : s:windowless
-    elseif s:mode.onekey || s:mode.windowless
-        let s:mode = s:mode.onekey ? s:windowless : s:onekey
     elseif s:mode.static || s:mode.dynamic
         let s:toggle_punctuation = (s:toggle_punctuation + 1) % 2
     endif
@@ -397,8 +368,6 @@ function! g:Vimim_label(key)
             sil!call s:vimim_reset_after_insert()
         endif
         let key = yes . omni
-    elseif s:mode.windowless && key =~ '\d'
-        let key = s:vimim_windowless(key)
     endif
     sil!exe 'sil!return "' . key . '"'
 endfunction
@@ -463,9 +432,6 @@ function! g:Punctuation(key)
     endif
     if pumvisible()        " the 2nd choice
         let key = a:key == ";" ? '\<C-N>\<C-Y>' : '\<C-Y>' . key
-    elseif s:mode.windowless && s:gi_dynamic
-        let key = a:key == ";" ? '\<C-N>' : key
-        call g:Vimim_space()
     endif
     sil!exe 'sil!return "' . key . '"'
 endfunction
@@ -474,9 +440,6 @@ function! g:Vimim_single_quote()
     let key = "'"
     if pumvisible()       " the 3rd choice
         let key = '\<C-N>\<C-N>\<C-Y>'
-    elseif s:mode.windowless && s:gi_dynamic
-        let key = '\<C-N>\<C-N>'
-        call g:Vimim_space()
     elseif g:Vimim_punctuation < 3
         return key
     elseif s:toggle_punctuation > 0
@@ -515,27 +478,6 @@ function! g:Vimim_tab(gi)
     elseif pumvisible() || s:ctrl6
         let @0 = getline(".")  " undo if dump out by accident
         let key = s:vimim_screenshot()
-    else
-        let s:mode = a:gi? s:windowless : s:onekey
-    endif
-    sil!exe 'sil!return "' . key . '"'
-endfunction
-
-function! s:vimim_windowless(key)
-    " workaround to test if active completion
-    let key = a:key          " gi \bslash space space
-    if s:pattern_not_found   " gi ma space xj space ctrl+u space
-    elseif s:vimim_left() && s:keyboard !~ ' ' " gi mmm.. space 7 space
-    elseif s:omni " assume completion active
-        let key = len(a:key) ? '\<C-E>\<C-R>=g:Vimim()\<CR>' : '\<C-N>'
-        let cursor = empty(len(a:key)) ? 1 : a:key < 1 ? 9 : a:key-1
-        if s:vimim_cjk()              " gi ma space isw8ql
-        else                          "  234567890 for windowless choice
-            let key = a:key =~ '[02-9]' ? repeat('\<C-N>', cursor) : key
-        endif
-        call s:vimim_windowless_titlestring(cursor)
-    else
-        call s:vimim_set_title(g:Vimim)
     endif
     sil!exe 'sil!return "' . key . '"'
 endfunction
@@ -569,10 +511,6 @@ function! g:Vimim_space()
         let key = s:vimim_left() ? g:Vimim() : key
     elseif s:seamless_positions == getpos(".") " gi ma space enter space
         let s:smart_enter = 0              " Space is Space after Enter
-    elseif s:mode.windowless && s:gi_dynamic
-        let key = ''                       " gi m space (the 1st choice)
-        let s:gi_dynamic_on = 1            " gi m ;     (the 2nd choice)
-        call s:vimim_set_title(g:Vimim)     " gi m '     (the 3rd choice)
     endif
     call s:vimim_reset_after_insert()
     sil!exe 'sil!return "' . key . '"'
@@ -1646,7 +1584,6 @@ function! s:vimim_reset_before_omni()
     let s:english.line = ""
     let s:touch_me_not = 0
     let s:show_extra_menu = 0
-    let s:cursor_at_windowless = 0
 endfunction
 
 function! s:vimim_reset_after_insert()
@@ -1747,19 +1684,6 @@ else
     "echom "s:english.line: " . s:english.line
     "echom "s:mode.onekey: " . s:mode.onekey
     "echom "s:mode.windowless: " . s:mode.windowless
-    if s:mode.onekey || s:mode.windowless
-        let results = []
-        if empty(results) && s:vimim_cjk()
-            let head = s:vimim_get_no_quote_head(keyboard)
-            let head = s:vimim_get_cjk_head(head)
-            let results = !empty(head) ? s:vimim_cjk_match(head) : []
-        endif
-        if len(results)
-            return s:vimim_popupmenu_list(results)
-        elseif get(split(s:keyboard),1) =~ "'"  " ssss.. for cloud
-            let keyboard = s:vimim_get_no_quote_head(keyboard)
-        endif
-    endif
     "echom "results: " . len(results)
     " 首先查找内置的引擎
     if empty(results)
@@ -1773,12 +1697,6 @@ else
     endif
     if empty(results)  " [the_last_resort] force shoupin or force cloud
         if s:mode.onekey || s:mode.windowless
-            if len(keyboard) > 1
-                let shoupin = s:vimim_get_no_quote_head(keyboard."'''")
-                let results = s:vimim_cjk_match(shoupin)
-            else
-                let results = [keyboard == 'i' ? "我" : s:space]
-            endif
         elseif s:mode.static
             let s:pattern_not_found = 1
         endif
@@ -1831,24 +1749,11 @@ function! s:vimim_popupmenu_list(lines)
             let complete_items["menu"] = menu
             "echom "complete_items: ".string(complete_items)
         endif
-        if s:mode.windowless
-            if s:vimim_cjk() " display sexy english and dynamic 4corner
-                let star = substitute(titleline,'[0-9a-z_ ]','','g')
-                let digit = s:vimim_cjk_in_4corner(chinese,1) " ma7 712
-            elseif label < 11   " 234567890 for windowless selection
-                let titleline = label == 10 ? "0" : label
-            endif
-            call add(one_list, titleline . chinese)
-        endif
         let label += 1
         let complete_items["dup"] = 1
         let complete_items["word"] = empty(chinese) ? s:space : chinese
         call add(s:popup_list, complete_items)
     endfor
-    if s:mode.windowless
-        let s:windowless_title = 'VimIM ' . keyboard .' '. join(one_list)
-        call s:vimim_windowless_titlestring(1)
-    endif
     call s:vimim_set_pumheight()
     Debug s:match_list[:1]
     return s:popup_list
