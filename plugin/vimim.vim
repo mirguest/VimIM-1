@@ -107,7 +107,6 @@ function! s:vimim_initialize_global()
     let s:seamless_positions = []
     let s:starts = { 'row' : 0, 'column' : 1 }
     let s:quanpin_table = {}
-    let s:http_exe = ""
     let s:abcd = split("'abcdvfgxz", '\zs')
     let s:qwer = split("pqwertyuio", '\zs')
     let s:az_list = map(range(97,122),"nr2char(".'v:val'.")")
@@ -720,18 +719,6 @@ function! s:vimim_unicode_to_utf8(xxxx)
         let utf8 .= nr2char(128+(ddddd%64))
     endif
     return utf8
-endfunction
-
-function! s:vimim_url_xx_to_chinese(xx)
-    let output = a:xx   " %E9%A6%AC => \xE9\xA6\xAC => 馬 u99AC
-    if s:http_exe =~ 'libvimim'
-        let output = libcall(s:http_exe, "do_unquote", output)
-    else
-        let pat = '%\(\x\x\)'
-        let sub = '\=eval(''"\x''.submatch(1).''"'')'
-        let output = substitute(output, pat, sub, 'g')
-    endif
-    return output
 endfunction
 
 function! s:vimim_rot13(keyboard)
