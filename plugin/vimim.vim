@@ -727,40 +727,6 @@ function! s:translators.translate(english) dict
     return join(map(inputs,'get(self.dict,tolower(v:val),v:val)'), '')
 endfunction
 
-function! s:vimim_imode_number(keyboard)
-    let keyboard = a:keyboard
-    let ii = keyboard[0:1]   " sample: i88 ii88 isw8ql iisw8ql
-    let keyboard = ii==#'ii' ? keyboard[2:] : keyboard[1:]
-    let dddl = keyboard=~#'^\d*\l\{1}$' ? keyboard[:-2] : keyboard
-    let number = ""
-    let keyboards = split(dddl, '\ze')
-    for char in keyboards
-        if has_key(s:quantifiers, char)
-            let quantifier_list = split(s:quantifiers[char], '\zs')
-            let chinese = get(quantifier_list, 0)
-            if ii ==# 'ii' && char =~# '[0-9sbq]'
-                let chinese = get(quantifier_list, 1)
-            endif
-            let number .= chinese
-        endif
-    endfor
-    if empty(number) | return [] | endif
-    let results = [number]
-    let last_char = keyboard[-1:]
-    if !empty(last_char) && has_key(s:quantifiers, last_char)
-        let quantifier_list = split(s:quantifiers[last_char], '\zs')
-        if keyboard =~# '^[ds]\=\d*\l\{1}$'
-            if keyboard =~# '^[ds]'
-                let number = strpart(number,0,len(number)-s:multibyte)
-            endif
-            let results = map(copy(quantifier_list), 'number . v:val')
-        elseif keyboard =~# '^\d*$' && len(keyboards)<2 && ii != 'ii'
-            let results = quantifier_list
-        endif
-    endif
-    return results
-endfunction
-
 " ============================================= }}}
 let s:VimIM += [" ====  input: unicode   ==== {{{"]
 " =================================================
