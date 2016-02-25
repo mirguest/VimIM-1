@@ -102,7 +102,6 @@ function! s:vimim_initialize_global()
     let s:colon = '：'
     let g:Vimim = "VimIM　中文輸入法"
     let s:windowless_title = "VimIM"
-    let s:today = s:vimim_imode_today_now('itoday')
     let s:multibyte    = &encoding =~ "utf-8" ? 3 : 2
     let s:localization = &encoding =~ "utf-8" ? 0 : 2
     let s:seamless_positions = []
@@ -164,7 +163,7 @@ function! s:vimim_set_frontend()
     let s:ui.quote = match(split(quote),s:ui.im) < 0 ? 0 : 1
     let s:gi_dynamic = s:ui.im =~ 'pinyin' || s:ui.root =~ 'cloud' ? 0 : 1
     let logo = s:chinese('dscj')
-    let tail = s:mode.windowless ? s:today : ''
+    let tail = ''
     if s:mode.dynamic || s:mode.static
         let logo = s:chinese('chinese',s:mode.static?'static':'dynamic')
         let tail = s:chinese('halfwidth')
