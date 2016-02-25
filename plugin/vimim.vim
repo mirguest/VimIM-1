@@ -214,23 +214,22 @@ let s:VimIM += [" ====  user interface   ==== {{{"]
 " =================================================
 
 function! s:vimim_dictionary_statusline()
-    let one  = " dscj taijima 4corner boshiamy input cjk nature"
-    let two  = " 点石成金,點石成金 新世纪,新世紀 太极码,太極碼"
-    let two .= " 四角号码,四角號碼 呒虾米,嘸蝦米 输入,輸入"
-    let two .= " 标准字库,標準字庫 自然码,自然碼"
-    let one .= " computer database option flypy network env "
-    let one .= " encoding ms static dynamic erbi hangul xinhua"
+    let one  = " dscj input cjk nature"
+    let two  = " 点石成金,點石成金 输入,輸入 标准字库,標準字庫 自然码,自然碼"
+    let one .= " computer database option network env "
+    let two .= " 电脑,電腦 词库,詞庫 选项,選項 联网,聯網 环境,環境"
+    let one .= " encoding ms static dynamic xinhua"
     let one .= " zhengma cangjie yong wu "
-    let two .= " 电脑,電腦 词库,詞庫 选项,選項 小鹤,小鶴 联网,聯網 云,雲 "
-    let two .= " 环境,環境 编码,編碼 微软,微軟 静态,靜態 动态,動態"
-    let two .= " 二笔,二筆 五笔,五筆 韩文,韓文 新华,新華 郑码,鄭碼"
-    let two .= " 仓颉,倉頡 永码,永碼 吴语,吳語 极点,極點 双拼,雙拼"
+    let two .= " 编码,編碼 微软,微軟 静态,靜態 动态,動態"
+    let two .= " 新华,新華 郑码,鄭碼"
+    let two .= " 仓颉,倉頡 永码,永碼 吴语,吳語"
     let one .= " hit fullwidth halfwidth english chinese purple plusplus"
     let one .= " quick pin pinyin phonetic array30"
-    let one .= " abc revision date google baidu sogou qq "
-    let two .= " 打 全角 半角 英文 中文 紫光 加加 速成 海峰 自己的 98"
-    let two .= " 拼 拼音 注音 行列 智能 版本 日期 谷歌 百度 搜狗 ＱＱ"
+    let one .= " abc revision date "
+    let two .= " 打 全角 半角 英文 中文 紫光 加加 速成"
+    let two .= " 拼 拼音 注音 行列 智能 版本 日期 "
     let s:chinese_statusline = s:vimim_key_value_hash(one, two)
+    "echom string(s:chinese_statusline)
 endfunction
 
 function! s:vimim_dictionary_punctuations()
