@@ -727,28 +727,6 @@ function! s:translators.translate(english) dict
     return join(map(inputs,'get(self.dict,tolower(v:val),v:val)'), '')
 endfunction
 
-function! s:vimim_imode_today_now(keyboard)
-    let one  = " year sunday monday tuesday wednesday thursday"
-    let one .= " friday saturday month day hour minute second"
-    let two  = join(split("年 日 一 二 三 四 五 六"), " 星期")
-    let two .= " 月 日 时 分 秒"
-    let chinese = copy(s:translators)
-    let chinese.dict = s:vimim_key_value_hash(one, two)
-    let time  = '公元'
-    let time .= strftime("%Y") . ' year  '
-    let time .= strftime("%m") . ' month '
-    let time .= strftime("%d") . ' day   '
-    if a:keyboard ==# 'itoday'
-        let time .= s:space .' '. strftime("%A")
-    elseif a:keyboard ==# 'inow'
-        let time .= strftime("%H") . ' hour   '
-        let time .= strftime("%M") . ' minute '
-        let time .= strftime("%S") . ' second '
-    endif
-    let filter = "substitute(" . 'v:val' . ",'^0','','')"
-    return chinese.translate(join(map(split(time), filter)))
-endfunction
-
 function! s:vimim_imode_number(keyboard)
     let keyboard = a:keyboard
     let ii = keyboard[0:1]   " sample: i88 ii88 isw8ql iisw8ql
