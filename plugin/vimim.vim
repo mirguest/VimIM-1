@@ -532,27 +532,6 @@ function! g:Vimim_backspace()
     sil!exe 'sil!return "' . key . '"'
 endfunction
 
-function! s:vimim_get_no_quote_head(keyboard)
-    let keyboard = a:keyboard
-    if keyboard =~ '\d' 
-        return keyboard
-    endif
-    if keyboard =~ '^\l\l\+'."'''".'$'
-        " [shoupin] hjkl_m || sssss..  =>  sssss'''  =>  s's's's's
-        let keyboard = substitute(keyboard, "'", "", 'g')
-        let keyboard = join(split(keyboard,'\zs'), "'")
-    endif
-    if keyboard =~ "'" && keyboard[-1:] != "'"
-        " [quote_by_quote] wo'you'yi'ge'meng
-        let keyboards = split(keyboard,"'")
-        let keyboard = get(keyboards,0)
-        let tail = join(keyboards[1:],"'")
-        let tail = len(tail) == 1 ? "'" . tail : tail
-        let s:keyboard = keyboard . " " . tail
-    endif
-    return keyboard
-endfunction
-
 " ============================================= }}}
 let s:VimIM += [" ====  mode: chinese    ==== {{{"]
 " =================================================
@@ -1661,9 +1640,6 @@ function! s:vimim_embedded_backend_engine(keyboard)
     let results = []
     let backend = s:backend[s:ui.root][s:ui.im]
     "echom string(backend)
-    if backend.name =~ "quote" && keyboard !~ "[']" " has apostrophe
-        let keyboard = s:vimim_quanpin_transform(keyboard)
-    endif
     if s:ui.root =~# "directory"
         let head = s:vimim_sentence_directory(keyboard, backend.name)
         let results = s:vimim_readfile(backend.name . head)
