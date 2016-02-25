@@ -791,22 +791,6 @@ function! s:vimim_cjk()
     return 1
 endfunction
 
-function! s:vimim_cjk_in_4corner(chinese, info)
-    let digit_head = ""  " gi ma   马　 =>   7712  <=>  mali 7 4
-    let digit_tail = ""  " gi mali 马力 => 7 4002  <=>  mali74
-    let chinese = substitute(a:chinese,'[\x00-\xff]','','g')
-    for cjk in split(chinese, '\zs')
-        let line = match(s:cjk.lines, "^" . cjk)
-        if line > -1
-            let values = split(get(s:cjk.lines, line))
-            let digit_head .= get(values,1)[:0]
-            let digit_tail  = get(values,1)[1:]
-        endif
-    endfor
-    let key = digit_head . digit_tail
-    return key
-endfunction
-
 function! s:vimim_cjk_property(chinese)
     let ddddd = char2nr(a:chinese)
     let xxxx  = printf('u%04x', ddddd)
