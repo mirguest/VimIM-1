@@ -272,10 +272,6 @@ endfunction
 
 function! s:vimim_get_label(label)
     let labeling = a:label == 10 ? "0" : a:label
-    if s:mode.onekey && a:label < 11
-        let label2 = a:label < 2 ? "_" : get(s:abcd,a:label-1)
-        let labeling = empty(labeling) ? '10' : labeling . label2
-    endif
     return labeling
 endfunction
 
@@ -357,13 +353,6 @@ function! g:Vimim_label(key)
         endif
         let yes = repeat("\<Down>", n). '\<C-Y>'
         let omni = '\<C-R>=g:Vimim()\<CR>'
-        if s:mode.onekey
-            if s:vimim_cjk() && a:key =~ '\d'
-                let yes = ''
-            elseif s:hit_and_run || a:key =~ '\d'
-                let omni = s:vimim_stop()
-            endif
-        endif
         if len(yes)
             sil!call s:vimim_reset_after_insert()
         endif
@@ -500,9 +489,6 @@ function! g:Vimim_space()
     let key = " "
     if pumvisible()
         let key = '\<C-R>=g:Vimim()\<CR>'
-        if s:mode.onekey && s:hit_and_run
-             let key = s:vimim_stop()
-        endif
         let cursor = s:mode.static ? '\<C-P>\<C-N>' : ''
         let key = cursor . '\<C-Y>' . key
     elseif s:pattern_not_found
