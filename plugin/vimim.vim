@@ -318,7 +318,7 @@ function! g:Vimim_esc()
     let key = nr2char(27)  "  <Esc> is <Esc> if onekey or windowless
     if s:mode.windowless || s:mode.onekey
     elseif pumvisible()
-        let key = g:Vimim_one_key_correction() " <Esc> as correction
+        "let key = g:Vimim_one_key_correction() " <Esc> as correction
     endif
     sil!exe 'sil!return "' . key . '"'
 endfunction
