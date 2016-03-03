@@ -1469,6 +1469,7 @@ guarantee 保证 包管
 guard 警卫 防守
 guangdianbeizengguan 光电倍增管
 guangxuemoxing 光学模型
+guangyinji 光阴极
 guess 猜测 以为 估计
 guest 客人 宾客
 guide 向导
