@@ -1805,6 +1805,7 @@ kowtow 磕头
 krypton 氪
 kungfu 功夫
 kuwait 科威特
+kuaisumoni 快速模拟
 lab 实验室
 label 标签 题签
 labor 劳动
@@ -2556,6 +2557,7 @@ qatar 卡塔尔
 qr 二维条码
 quail 鹌 鹑
 quantity 量 数量
+quanmoni 全模拟
 quarrel 口角 吵架
 quarter 一刻 四分之一
 queen 皇后 女王
@@ -3074,6 +3076,7 @@ sufficient 充分 丰富 足够
 sugar 糖
 suggest 建议
 suicide 自杀 被自杀
+suijishu 随机数
 suitable 适合 适宜
 sulphur 硫
 sum 总数 总计 总和
@@ -3536,3 +3539,9 @@ zombie 僵尸 行尸走肉
 zone 区域 地带
 zoo 动物园
 zoology 动物学
+
+juhao 句号 。
+tanhao 叹号 ！
+douhao 逗号 ，
+dunhao 顿号 、
+dh 、 ，
